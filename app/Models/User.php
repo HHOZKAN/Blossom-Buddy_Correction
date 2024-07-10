@@ -49,6 +49,9 @@ class User extends Authenticatable
 
     public function plants()
     {
-        return $this->belongsToMany(Plant::class);
+        return $this->belongsToMany(Plant::class)
+        ->using(PlantUser::class)
+        ->withPivot('id', 'city')
+        ->withTimestamps();
     }
 }

@@ -1,0 +1,201 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Documentation",
+        "description": "L5 Swagger OpenApi description",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/plants": {
+            "get": {
+                "tags": [
+                    "Plants"
+                ],
+                "summary": "Get list of plants",
+                "description": "Returns list of plants",
+                "operationId": "getPlantsList",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Plant"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Plants"
+                ],
+                "summary": "Store a new plant",
+                "operationId": "storePlant",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Plant"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Plant created successfully"
+                    }
+                }
+            }
+        },
+        "/api/plants/{common_name}": {
+            "get": {
+                "tags": [
+                    "Plants"
+                ],
+                "summary": "Get plant by common name",
+                "description": "Returns a single plant",
+                "operationId": "getPlantByCommonName",
+                "parameters": [
+                    {
+                        "name": "common_name",
+                        "in": "path",
+                        "description": "The common name of the plant",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Plant"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Plant not found"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Plants"
+                ],
+                "summary": "Update an existing plant",
+                "description": "Updates a plant by common_name",
+                "operationId": "updatePlantByCommonName",
+                "parameters": [
+                    {
+                        "name": "common_name",
+                        "in": "path",
+                        "description": "common_name of the plant to update",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Plant"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Plant"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Plant not found"
+                    },
+                    "422": {
+                        "description": "Unprocessable Content"
+                    }
+                }
+            }
+        },
+        "/api/plants/{id}": {
+            "delete": {
+                "tags": [
+                    "Plants"
+                ],
+                "summary": "Delete an existing plant",
+                "description": "Delete a plant by id if it exists",
+                "operationId": "deletePlant",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "id of the plant to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Plant successfully deleted"
+                    },
+                    "404": {
+                        "description": "Plant not found"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Plant": {
+                "title": "Plant",
+                "properties": {
+                    "common_name": {
+                        "description": "The common name of the plant",
+                        "type": "string"
+                    },
+                    "watering_general_benchmark": {
+                        "description": "The general watering benchmark of the plant",
+                        "properties": {
+                            "value": {
+                                "type": "string"
+                            },
+                            "unit": {
+                                "type": "string"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Plants",
+            "description": "Plants"
+        }
+    ]
+}

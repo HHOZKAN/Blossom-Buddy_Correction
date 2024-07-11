@@ -10,8 +10,8 @@ use Illuminate\Http\Request;
 /**
  * @OA\Info(
  *      version="1.0.0",
- *      title="API Documentation",
- *      description="L5 Swagger OpenApi description", 
+ *      title="Blossom Buddy - API Documentation",
+ *      description="Blossom Buddy app, backend documentation", 
  * )
  */
 class PlantController extends Controller

@@ -364,6 +364,178 @@
                     }
                 }
             }
+        },
+        "/api/user/plants": {
+            "get": {
+                "tags": [
+                    "UserPlants"
+                ],
+                "summary": "Get user's plants",
+                "description": "Returns the list of plants that the authenticated user possesses",
+                "operationId": "getPlantsUser",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Plant"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/plant": {
+            "post": {
+                "tags": [
+                    "UserPlants"
+                ],
+                "summary": "Add a plant to user's list",
+                "description": "Allows an authenticated user to add a plant to their list",
+                "operationId": "addPlantUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "plant_name",
+                                    "city"
+                                ],
+                                "properties": {
+                                    "plant_name": {
+                                        "type": "string",
+                                        "example": "Rose"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Paris"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Plant added to user successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Plant added to user successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Plant not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Plant not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/plant/{id}": {
+            "delete": {
+                "tags": [
+                    "UserPlants"
+                ],
+                "summary": "Delete a plant from user's list",
+                "description": "Allows an authenticated user to delete a plant from their list",
+                "operationId": "deletePlantUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Plant ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Plant deleted from user successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Plant deleted from user successfully"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Plant not found in user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Plant not found in user"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -444,6 +616,10 @@
         {
             "name": "Plants",
             "description": "Plants"
+        },
+        {
+            "name": "UserPlants",
+            "description": "UserPlants"
         }
     ],
     "security": [

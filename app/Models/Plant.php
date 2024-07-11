@@ -19,6 +19,11 @@ class Plant extends Model
         'watering_general_benchmark' => 'array',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);

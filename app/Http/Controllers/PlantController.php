@@ -132,8 +132,6 @@ class PlantController extends Controller
      */
     public function update(Request $request, string $common_name): JsonResponse
     {
-
-        // A FINIR ///////////////////////////////////////////////////////////////////
         $validatedData = $request->validate([
             'common_name' => 'sometimes|string|max:255',
             'watering_general_benchmark' => 'sometimes|array',
@@ -169,8 +167,8 @@ class PlantController extends Controller
 
         return response()->json($plant);
     }
-
-     /**
+    
+    /**
      * @OA\Delete(
      *     path="/api/plants/{id}",
      *     operationId="deletePlant",

@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Interfaces\PlantServiceInterface;
-use App\Services\PlantService;
 use Illuminate\Console\Command;
 
 class FetchPlants extends Command
@@ -23,7 +22,7 @@ class FetchPlants extends Command
     protected $description = 'Fetch the first 30 plants from the API and store them in the database';
 
 
-    protected PlantService $plantService;
+    protected PlantServiceInterface $plantService;
 
     public function __construct(PlantServiceInterface $plantService)
     {

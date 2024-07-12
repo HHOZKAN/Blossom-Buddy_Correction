@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\WeatherServiceInterface;
 use App\Models\Plant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -79,7 +80,7 @@ class UserPlantController extends Controller
      *      )
      * )
      */
-    public function addPlantUser(Request $request): JsonResponse
+    public function addPlantUser(Request $request, WeatherServiceInterface $weatherService): JsonResponse
     {
         
         $validated = $request->validate([
@@ -99,9 +100,35 @@ class UserPlantController extends Controller
 
         $city = $validated['city'];
 
+        // Extract watering benchmarks from the plant
+        $wateringBenchmark = $plant->watering_general_benchmark;
+        $unit = $wateringBenchmark['unit'];
+        $value = $wateringBenchmark['value'];
+
+        // Calculate the number of days until the next watering
+        $daysUntilNextWatering = 0;
+        if ($unit === 'days') {
+            $range = explode('-', $value);
+            $daysUntilNextWatering = (int) $range[0]; // Taking the lower bound of the range
+        } elseif ($unit === 'week') {
+            $range = explode('-', $value);
+            $daysUntilNextWatering = (int) $range[0] * 7; // Convert weeks to days
+        }
+
+        // Determine the number of days to pass to the weather service
+        $daysForWeatherService = $daysUntilNextWatering >= 5 ? 5 : $daysUntilNextWatering;
+
+        // Use the weather service to get the forecast for the city
+        $weatherData = $weatherService->getWeatherForecast($city, $daysForWeatherService);
+
         $user->plants()->attach($plant->id, ['city' => $city]);
 
-        return response()->json(['message' => 'Plant added to user successfully'], 200);
+        // IL FAUT MAINTENANT CALCULER QUAND ON DOIT ARROSER LA PLANTE
+
+        return response()->json([
+            'message' => 'Plant added to user successfully',
+            'weather' => $weatherData
+        ], 200);
     }
 
 

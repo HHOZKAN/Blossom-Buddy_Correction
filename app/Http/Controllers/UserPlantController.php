@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Interfaces\WeatherServiceInterface;
+use App\Jobs\SendWateringReminder;
 use App\Models\Plant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -82,7 +83,7 @@ class UserPlantController extends Controller
      */
     public function addPlantUser(Request $request, WeatherServiceInterface $weatherService): JsonResponse
     {
-        
+
         $validated = $request->validate([
             'plant_name' => 'required|string',
             'city' => 'required|string',
@@ -121,13 +122,39 @@ class UserPlantController extends Controller
         // Use the weather service to get the forecast for the city
         $weatherData = $weatherService->getWeatherForecast($city, $daysForWeatherService);
 
+        // We will convert days into hours to be able to delay the job
+        $hoursUntilNextWatering = $daysUntilNextWatering * 24;
+
+        // For each day in the forecast, calculate a coefficient and apply it to the days until next watering
+        foreach ($weatherData as $day) {
+            $humidity = $day['avghumidity'];
+
+            // For eache 10% above 70%, we add 10% to daysUntilNextWatering
+            if ($humidity > 70) {
+                $tranchesAbove70 = floor(($humidity - 70) / 10) + 1;
+                $hoursUntilNextWatering += $hoursUntilNextWatering * (0.1 * $tranchesAbove70);
+            }
+            // For each 10% under 40%, we remove 10% to daysUntilNextWatering
+            elseif ($humidity < 40) {
+                $tranchesBelow40 = floor((40 - $humidity) / 10) - 1;
+                $hoursUntilNextWatering -= $hoursUntilNextWatering * (0.1 * $tranchesBelow40);
+            }
+        }
+
+        // Convert hours into days + hours for the delay
+        $days = floor($hoursUntilNextWatering / 24);
+        $hours = $hoursUntilNextWatering % 24;
+
         $user->plants()->attach($plant->id, ['city' => $city]);
 
-        // IL FAUT MAINTENANT CALCULER QUAND ON DOIT ARROSER LA PLANTE
+        // Dispatch the Laravel job to send the reminder
+        SendWateringReminder::dispatch($user, $plant->common_name)->delay(now()->addDays($days)->addHours($hours));
+
 
         return response()->json([
             'message' => 'Plant added to user successfully',
-            'weather' => $weatherData
+            'daysUntilNextWatering' => $days,
+            'hoursUntilNextWatering' => $hours
         ], 200);
     }
 

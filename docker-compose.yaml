@@ -1,0 +1,33 @@
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    env_file:
+      - .env.production
+    depends_on:
+      - db
+    volumes:
+      - .:/var/www/html
+    command: >
+      sh -c "
+      ./wait-for-db.sh &&
+      php artisan migrate --force &&
+      php artisan db:seed --force &&
+      apache2-foreground
+      "
+
+volumes:
+  db_data:
